@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,initial-scale=1.0,user-scalable=0" />
+<meta charset="utf-8" />
+<title>Websocket</title>
+<script>
+let websocket = null;
+function doConnect() {
+	websocket = new WebSocket(document.myform.url.value);
+	websocket.onopen = onOpen;
+	websocket.onclose = onClose;
+	websocket.onmessage = onMessage;
+	websocket.onerror = onError;
+}
+function doDisconnect() {
+	websocket.close();
+	websocket = null;
+}
+function onOpen() {
+	writeToScreen('Connected');
+	document.myform.connectButton.disabled = true;
+	document.myform.disconnectButton.disabled = false;
+}
+function onClose() {
+	writeToScreen('Disconnected');
+	document.myform.connectButton.disabled = false;
+	document.myform.disconnectButton.disabled = true;
+}
+function onError(evt) {
+	writeToScreen('Error: ' + evt.data);
+	websocket.close();
+	websocket = null;
+	document.myform.connectButton.disabled = false;
+	document.myform.disconnectButton.disabled = true;
+}
+function onMessage(evt) {
+	writeToScreen(evt.data);
+}
+function sendText() {
+	if (!websocket) return;
+	let msg = document.myform.inputtext.value;
+	writeToScreen(msg, 'own');
+	websocket.send(msg);
+}
+function clearText() {
+	document.myform.inputtext.value = '';
+}
+function showTime() {
+	let now = new Date(), y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate(), h = now.getHours(), n = now.getMinutes(), s = now.getSeconds();
+	return y + '-' + m + '-' + d + ' ' + h + ':' + n + ':' + s;
+}
+function writeToScreen(msg, cls) {
+	if (typeof cls === 'undefined') cls = '';
+	document.getElementById('output').innerHTML += '<div class="'+cls+'"><label>'+showTime()+'</label><div>' + msg + '</div></div>';
+	document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+}
+function changeCh() {
+	if (!websocket) return;
+	let symbol = document.myform.symbol.value;
+	let period = document.myform.period.value;
+	let data = {
+		set: 'ch',
+		symbol: symbol,
+		period: period
+	}
+	websocket.send(JSON.stringify(data));
+}
+</script>
+<style>
+*{outline:none; resize:none;}
+html, body{padding:0; margin:0; height:100%; text-align:left;}
+.container{padding:20px 20px 20px 650px; height:100%; box-sizing:border-box;}
+.form{margin-left:-650px; float:left; width:650px; padding:0 20px; box-sizing:border-box;}
+.form > div{height:36px; margin-bottom:15px; padding-right:200px;}
+.form > div input{width:90px; height:100%; border-radius:5px; font-size:12px; border:none; padding:0 10px; box-sizing:border-box; float:left; margin-right:10px;}
+.form > div [type="text"]{width:100%; border:1px solid #ccc;}
+.form > div [type="button"]{float:right; margin-right:-100px;}
+.form > div [type="button"]:first-child{margin-right:-200px;}
+.form > span{display:block;}
+.form > span > textarea{width:100%; height:100px; margin-bottom:15px; float:left; font-size:12px; padding:10px; border:1px solid #ccc; box-sizing:border-box; border-radius:5px;}
+.form > span > label{height:36px; display:block;}
+.form > span > label input{width:90px; height:100%; border-radius:5px; font-size:12px; border:none; padding:0 5px; box-sizing:border-box; float:left; margin-right:15px;}
+.form > label{display:block; height:36px; margin-bottom:15px; margin-right:calc((100% - 15px) / 2 + 15px);}
+.form > label select{border-radius:5px; font-size:12px; border:1px solid #ccc; padding:0 10px; box-sizing:border-box; width:100%; height:100%;}
+.form > label select:first-child{float:right; margin-right:calc(-100% - 15px);}
+#output{height:100%; overflow:auto; overflow-x:hidden; font-size:14px; background:#f3f3f3; border-radius:5px; padding:20px; box-sizing:border-box;}
+#output > div{margin-bottom:20px; width:80%; float:left;}
+#output > div > label{color:#ccc; display:block; width:100%; transform:scale(0.83); transform-origin:left;}
+#output > div > div{float:left; max-width:100%; padding:10px; border-radius:5px; background:#fff; word-break:break-all; white-space:pre-wrap;}
+#output > div.own{float:right;}
+#output > div.own > label{transform-origin:right; text-align:right; float:right;}
+#output > div.own > div{float:right; background:#A9EA7A;}
+@media (max-width: 768px) {
+	.container{padding:36px 0 72px 0;}
+	.form{margin:-36px 0 0 0; float:none; width:100%; padding:0; clear:both;}
+	.form *{border-radius:0 !important;}
+	.form > div{padding-right:180px; margin-bottom:0; position:relative;}
+	.form > div:after{content:""; display:block; position:absolute; z-index:1; left:0; right:0; bottom:0; height:1px; background:#f3f3f3;}
+	.form > div [type="text"]{border:none;}
+	.form > div [type="button"]{margin-right:-90px;}
+	.form > div [type="button"]:first-child{margin-right:-180px;}
+	.form > span{position:absolute; left:0; right:0; bottom:0; padding-right:90px;}
+	.form > span:before{content:""; display:block; position:absolute; z-index:1; left:0; right:0; top:0; height:1px; background:#f3f3f3;}
+	.form > span > textarea{height:36px; border:none; margin-bottom:0;}
+	.form > span > label{position:absolute; top:0; right:0;}
+	.form > span > label input{margin:0;}
+	.form > span > label input:last-child{display:none;}
+	.form > label{position:absolute; left:0; right:0; bottom:36px; margin:0; padding-right:calc(100% / 2);}
+	.form > label:before{content:""; display:block; position:absolute; z-index:1; left:0; right:0; top:0; height:1px; background:#f3f3f3;}
+	.form > label:after{content:""; display:block; position:absolute; z-index:1; left:50%; top:0; bottom:0; width:1px; background:#f3f3f3;}
+	.form > label select{border:none;}
+	.form > label select:first-child{margin-right:-100%;}
+	#output{float:none; padding:15px; clear:both; border-radius:0;}
+	#output > div{width:90%;}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+	<form name="myform" class="form">
+		<div>
+			<input type="button" name="disconnectButton" value="Disconnect" disabled onclick="doDisconnect()">
+			<input type="button" name="connectButton" value="Connect" onclick="doConnect()">
+			<input type="text" name="url" value="ws://localhost:7312" />
+		</div>
+		<label>
+			<select name="period" onchange="changeCh()">
+				<option value="1min">1MIN</option>
+				<option value="30min">30MIN</option>
+				<option value="60min">60MIN</option>
+			</select>
+			<select name="symbol" onchange="changeCh()">
+				<option value="btc">BTC</option>
+				<option value="eth">ETH</option>
+			</select>
+		</label>
+		<span>
+			<textarea name="inputtext">Hello World!</textarea>
+			<label>
+				<input type="button" name="sendButton" value="Send" onclick="sendText()">
+				<input type="button" name="clearButton" value="Clear" onclick="clearText()">
+			</label>
+		</span>
+	</form>
+	<div id="output"></div>
+</div>
+</body>
+</html>
