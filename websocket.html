@@ -4,72 +4,12 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,initial-scale=1.0,user-scalable=0" />
 <meta charset="utf-8" />
 <title>Websocket</title>
-<script>
-let websocket = null;
-function doConnect() {
-	websocket = new WebSocket(document.myform.url.value);
-	websocket.onopen = onOpen;
-	websocket.onclose = onClose;
-	websocket.onmessage = onMessage;
-	websocket.onerror = onError;
-}
-function doDisconnect() {
-	websocket.close();
-	websocket = null;
-}
-function onOpen() {
-	writeToScreen('Connected');
-	document.myform.connectButton.disabled = true;
-	document.myform.disconnectButton.disabled = false;
-}
-function onClose() {
-	writeToScreen('Disconnected');
-	document.myform.connectButton.disabled = false;
-	document.myform.disconnectButton.disabled = true;
-}
-function onError(evt) {
-	writeToScreen('Error: ' + evt.data);
-	websocket.close();
-	websocket = null;
-	document.myform.connectButton.disabled = false;
-	document.myform.disconnectButton.disabled = true;
-}
-function onMessage(evt) {
-	writeToScreen(evt.data);
-}
-function sendText() {
-	if (!websocket) return;
-	let msg = document.myform.inputtext.value;
-	writeToScreen(msg, 'own');
-	websocket.send(msg);
-}
-function clearText() {
-	document.myform.inputtext.value = '';
-}
-function showTime() {
-	let now = new Date(), y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate(), h = now.getHours(), n = now.getMinutes(), s = now.getSeconds();
-	return y + '-' + m + '-' + d + ' ' + h + ':' + n + ':' + s;
-}
-function writeToScreen(msg, cls) {
-	if (typeof cls === 'undefined') cls = '';
-	document.getElementById('output').innerHTML += '<div class="'+cls+'"><label>'+showTime()+'</label><div>' + msg + '</div></div>';
-	document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
-}
-function changeCh() {
-	if (!websocket) return;
-	let symbol = document.myform.symbol.value;
-	let period = document.myform.period.value;
-	let data = {
-		set: 'ch',
-		symbol: symbol,
-		period: period
-	}
-	websocket.send(JSON.stringify(data));
-}
-</script>
 <style>
-*{outline:none; resize:none;}
+*{outline:none; resize:none; font-family:"Microsoft YaHei",Arial,sans-serif; box-shadow:none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; -webkit-touch-callout:none; -webkit-appearance:none; appearance:none; color:#333;}
 html, body{padding:0; margin:0; height:100%; text-align:left;}
+select{background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaBAMAAABbZFH9AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAYUExURQAAAJubmzU1NeXl5cDAwG5ubktLSzMzM1UuNQsAAAAHdFJOUwBs2hZDnMJGJx/RAAAAX0lEQVQY02NgAAMWBmRgJIDMC1dG4rColyIrLC9yQFJYXp6MpLC8vBDOYysvLy8ygPGEgLzyACiHWR3EU4RpEwQDBsoAqimoNqDajuYyVFej+gjNt6ghgRpKaCEIDV0AINgZk/WudOIAAAAASUVORK5CYII="); background-repeat:no-repeat; background-position:calc(100% - 5px) center; background-size:13px 13px;}
+input[type="button"]{background:#efefef;}
+input[type="button"][disabled]{background:#fafafa; color:#b3b3b3;}
 .container{padding:20px 20px 20px 650px; height:100%; box-sizing:border-box;}
 .form{margin-left:-650px; float:left; width:650px; padding:0 20px; box-sizing:border-box;}
 .form > div{height:36px; margin-bottom:15px; padding-right:200px;}
@@ -84,13 +24,13 @@ html, body{padding:0; margin:0; height:100%; text-align:left;}
 .form > label{display:block; height:36px; margin-bottom:15px; margin-right:calc((100% - 15px) / 2 + 15px);}
 .form > label select{border-radius:5px; font-size:12px; border:1px solid #ccc; padding:0 10px; box-sizing:border-box; width:100%; height:100%;}
 .form > label select:first-child{float:right; margin-right:calc(-100% - 15px);}
-#output{height:100%; overflow:auto; overflow-x:hidden; font-size:14px; background:#f3f3f3; border-radius:5px; padding:20px; box-sizing:border-box;}
+#output{height:100%; overflow:auto; overflow-x:hidden; font-size:12px; background:#f3f3f3; border-radius:5px; padding:20px; box-sizing:border-box;}
 #output > div{margin-bottom:20px; width:80%; float:left;}
-#output > div > label{color:#ccc; display:block; width:100%; transform:scale(0.83); transform-origin:left;}
+#output > div > label{color:#ccc; display:block; width:100%; line-height:20px;}
 #output > div > div{float:left; max-width:100%; padding:10px; border-radius:5px; background:#fff; word-break:break-all; white-space:pre-wrap;}
 #output > div.own{float:right;}
-#output > div.own > label{transform-origin:right; text-align:right; float:right;}
-#output > div.own > div{float:right; background:#A9EA7A;}
+#output > div.own > label{text-align:right; float:right;}
+#output > div.own > div{float:right; background:#a9ea7a;}
 @media (max-width: 768px) {
 	.container{padding:36px 0 72px 0;}
 	.form{margin:-36px 0 0 0; float:none; width:100%; padding:0; clear:both;}
@@ -123,7 +63,7 @@ html, body{padding:0; margin:0; height:100%; text-align:left;}
 		<div>
 			<input type="button" name="disconnectButton" value="Disconnect" disabled onclick="doDisconnect()">
 			<input type="button" name="connectButton" value="Connect" onclick="doConnect()">
-			<input type="text" name="url" value="ws://localhost:7312" />
+			<input type="text" name="url" value="" />
 		</div>
 		<label>
 			<select name="period" onchange="changeCh()">
@@ -148,3 +88,71 @@ html, body{padding:0; margin:0; height:100%; text-align:left;}
 </div>
 </body>
 </html>
+<script>
+let ws = null, host = 'ws://localhost:7312';
+if (window.localStorage.getItem('Websocket.host')) host = window.localStorage.getItem('Websocket.host');
+document.myform.url.value = host;
+
+function doConnect() {
+	let value = document.myform.url.value;
+	window.localStorage.setItem('Websocket.host', value);
+	ws = new WebSocket(value);
+	ws.onopen = onOpen;
+	ws.onclose = onClose;
+	ws.onerror = onError;
+	ws.onmessage = onMessage;
+}
+function doDisconnect() {
+	ws.close();
+	ws = null;
+}
+function onOpen() {
+	writeToScreen('Connected');
+	document.myform.connectButton.disabled = true;
+	document.myform.disconnectButton.disabled = false;
+}
+function onClose() {
+	writeToScreen('Disconnected');
+	document.myform.connectButton.disabled = false;
+	document.myform.disconnectButton.disabled = true;
+}
+function onError(e) {
+	writeToScreen('Error: ' + JSON.stringify(e));
+	ws.close();
+	ws = null;
+	document.myform.connectButton.disabled = false;
+	document.myform.disconnectButton.disabled = true;
+}
+function onMessage(e) {
+	writeToScreen(e.data);
+}
+function sendText() {
+	if (!ws) return;
+	let msg = document.myform.inputtext.value;
+	writeToScreen(msg, 'own');
+	ws.send(msg);
+}
+function clearText() {
+	document.myform.inputtext.value = '';
+}
+function showTime() {
+	let now = new Date(), y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate(), h = now.getHours(), n = now.getMinutes(), s = now.getSeconds();
+	return y + '-' + m + '-' + d + ' ' + h + ':' + n + ':' + s;
+}
+function writeToScreen(msg, cls) {
+	if (typeof cls === 'undefined') cls = '';
+	document.getElementById('output').innerHTML += '<div class="'+cls+'"><label>'+showTime()+'</label><div>' + msg + '</div></div>';
+	document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+}
+function changeCh() {
+	if (!ws) return;
+	let symbol = document.myform.symbol.value;
+	let period = document.myform.period.value;
+	let data = {
+		set: 'ch',
+		symbol: symbol,
+		period: period
+	}
+	ws.send(JSON.stringify(data));
+}
+</script>
