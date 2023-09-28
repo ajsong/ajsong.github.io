@@ -4,155 +4,360 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,initial-scale=1.0,user-scalable=0" />
 <meta charset="utf-8" />
 <title>Websocket</title>
+<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/recorderjs/0.1.0/recorder.min.js"></script>
 <style>
-*{outline:none; resize:none; font-family:"Microsoft YaHei",Arial,sans-serif; box-shadow:none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; -webkit-touch-callout:none; -webkit-appearance:none; appearance:none; color:#333;}
-html, body{padding:0; margin:0; height:100%; text-align:left;}
-select{background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaBAMAAABbZFH9AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAYUExURQAAAJubmzU1NeXl5cDAwG5ubktLSzMzM1UuNQsAAAAHdFJOUwBs2hZDnMJGJx/RAAAAX0lEQVQY02NgAAMWBmRgJIDMC1dG4rColyIrLC9yQFJYXp6MpLC8vBDOYysvLy8ygPGEgLzyACiHWR3EU4RpEwQDBsoAqimoNqDajuYyVFej+gjNt6ghgRpKaCEIDV0AINgZk/WudOIAAAAASUVORK5CYII="); background-repeat:no-repeat; background-position:calc(100% - 5px) center; background-size:13px 13px;}
-input[type="button"]{background:#efefef;}
-input[type="button"][disabled]{background:#fafafa; color:#b3b3b3;}
-.container{padding:20px 20px 20px 650px; height:100%; box-sizing:border-box;}
+*{outline:none; resize:none; font-family:"Microsoft YaHei",Arial,sans-serif; box-shadow:none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; -webkit-touch-callout:none; -webkit-appearance:none; appearance:none; -webkit-tap-highlight-color:rgba(255,0,0,0); color:#333;}
+html, body{padding:0; margin:0; height:100%; overflow:hidden; text-align:left; -webkit-touch-callout:none; -webkit-user-select:none;}
+ul, li, img{list-style:none; padding:0; margin:0; border:none;}
+.clear{clear:both; display:block;}
+.clear-after:after{content:""; display:block; clear:both;}
+.container{padding:20px 20px 20px 650px; height:100%; box-sizing:border-box; transition:all 0.3s ease-out;}
 .form{margin-left:-650px; float:left; width:650px; padding:0 20px; box-sizing:border-box;}
-.form > div{height:36px; margin-bottom:15px; padding-right:200px;}
-.form > div input{width:90px; height:100%; border-radius:5px; font-size:12px; border:none; padding:0 10px; box-sizing:border-box; float:left; margin-right:10px;}
-.form > div [type="text"]{width:100%; border:1px solid #ccc;}
-.form > div [type="button"]{float:right; margin-right:-100px;}
-.form > div [type="button"]:first-child{margin-right:-200px;}
-.form > span{display:block;}
-.form > span > textarea{width:100%; height:100px; margin-bottom:15px; float:left; font-size:12px; padding:10px; border:1px solid #ccc; box-sizing:border-box; border-radius:5px;}
-.form > span > label{height:36px; display:block;}
-.form > span > label input{width:90px; height:100%; border-radius:5px; font-size:12px; border:none; padding:0 5px; box-sizing:border-box; float:left; margin-right:15px;}
-.form > label{display:block; height:36px; margin-bottom:15px; margin-right:calc((100% - 15px) / 2 + 15px);}
-.form > label select{border-radius:5px; font-size:12px; border:1px solid #ccc; padding:0 10px; box-sizing:border-box; width:100%; height:100%;}
-.form > label select:first-child{float:right; margin-right:calc(-100% - 15px);}
-#output{height:100%; overflow:auto; overflow-x:hidden; font-size:12px; background:#f3f3f3; border-radius:5px; padding:20px; box-sizing:border-box;}
-#output > div{margin-bottom:20px; width:80%; float:left;}
-#output > div > label{color:#ccc; display:block; width:100%; line-height:20px;}
-#output > div > div{float:left; max-width:100%; padding:10px; border-radius:5px; background:#fff; word-break:break-all; white-space:pre-wrap;}
-#output > div.own{float:right;}
-#output > div.own > label{text-align:right; float:right;}
-#output > div.own > div{float:right; background:#a9ea7a;}
+.form > .connect{position:fixed; z-index:10; left:0; right:0; top:0; bottom:0; background:#f7f7f7; transition:all 0.3s ease-out;}
+.form > .connect input{width:calc(100% - 20px * 2); height:36px; margin:20px; border-radius:5px; border:1px solid #ddd; padding:0 10px; box-sizing:border-box;}
+.form > .connect div{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:170px; height:170px; cursor:pointer;}
+.form > .connect div:after{content:""; display:block; position:absolute; left:0; top:0; right:0; bottom:0; border-radius:50%; background:#eee url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M297.3%20922c-52.3%200-101.4-20.3-138.2-57.1S102%20779%20102%20726.7s20.3-101.4%2057.1-138.2l141.8-141.8c13.7-13.7%2035.8-13.7%2049.5%200s13.7%2035.8%200%2049.5L208.5%20638c-48.9%2048.9-48.9%20128.5%200%20177.4%2024.5%2024.5%2056.6%2036.7%2088.7%2036.7s64.2-12.2%2088.7-36.7l141.9-141.9c23.6-23.6%2036.5-55.1%2036.5-88.7s-13-65.1-36.5-88.7c-13.7-13.7-13.7-35.8%200-49.5s35.8-13.7%2049.5%200c36.8%2036.8%2057.1%2085.9%2057.1%20138.2S614.1%20686.2%20577.3%20723L435.4%20864.9c-36.7%2036.8-85.8%2057.1-138.1%2057.1z%22%20fill%3D%22%23d81e06%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M471.4%20587.6c-9%200-17.9-3.4-24.7-10.3-36.8-36.8-57.1-85.9-57.1-138.2s20.3-101.4%2057.1-138.2l141.8-141.8c36.8-36.8%2085.9-57.1%20138.2-57.1s101.4%2020.3%20138.2%2057.1S922%20245%20922%20297.3s-20.3%20101.4-57.1%20138.2L723.2%20577.3c-13.7%2013.7-35.8%2013.7-49.5%200s-13.7-35.8%200-49.5L815.4%20386c23.6-23.6%2036.6-55.1%2036.6-88.7s-13-65.1-36.5-88.7c-23.6-23.6-55.1-36.5-88.7-36.5s-65.1%2013-88.7%2036.5l-142%20141.8c-23.6%2023.6-36.5%2055.1-36.5%2088.7s13%2065.1%2036.5%2088.7c13.7%2013.7%2013.7%2035.8%200%2049.5-6.8%206.9-15.7%2010.3-24.7%2010.3z%22%20fill%3D%22%23d81e06%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat center center; background-size:60% auto;}
+.form > .connect.connected{transform:translateY(-100%);}
+.form > .header{display:none;}
+.form > input{display:none;}
+.form > .msg{display:block; margin-bottom:15px; box-sizing:border-box;}
+.form > .msg > textarea{width:100%; height:100px; margin-bottom:15px; float:left; font-size:12px; padding:10px; border:1px solid #ddd; box-sizing:border-box; border-radius:5px; outline:none; resize:none;}
+.form > .msg > div{height:38px; float:left;}
+.form > .msg > div input, .form > .msg > span a, .form > .msg > span a:hover{display:block; width:90px; height:100%; border-radius:5px; font-size:12px; border:none; cursor:pointer; padding:0 5px; box-sizing:border-box; float:left; margin-right:15px; color:#fff; text-align:center; background:#398bfc; text-decoration:none; text-transform:uppercase;}
+.form > .msg > div label{display:none; float:left; height:100%; cursor:pointer;}
+.form > .msg > span{display:block; float:left; height:38px;}
+.form > .msg > span a, .form > .msg > span a:hover{line-height:36px; color:#666; border:1px solid #999; background:no-repeat center center; background-size:50% auto;}
+.form > .user{overflow-y:hidden; white-space:nowrap; height:50px;}
+.form > .user li{display:inline-block; width:50px; height:100%; line-height:76px; overflow:hidden; text-align:center; border-radius:5px; box-sizing:border-box; font-size:10px; margin-right:10px; cursor:pointer; border:1px solid transparent; background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M822.716393%201024H192.41382a189.960821%20189.960821%200%200%201-189.719141-189.719141V188.752419A189.960821%20189.960821%200%200%201%20192.41382%200h630.302573a189.960821%20189.960821%200%200%201%20189.719141%20189.719141v644.561718a189.960821%20189.960821%200%200%201-189.719141%20189.719141zM192.41382%2069.362285a119.390135%20119.390135%200%200%200-119.390134%20119.390134v645.52844a119.390135%20119.390135%200%200%200%20119.390134%20119.390135h630.302573a119.390135%20119.390135%200%200%200%20119.390134-119.390135V188.752419a119.390135%20119.390135%200%200%200-119.390134-119.390134z%22%20fill%3D%22%23eeeeee%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M508.048467%20546.922823a182.952089%20182.952089%200%201%201%20182.710409-182.710409%20183.193769%20183.193769%200%200%201-182.710409%20182.710409z%20m0-293.158367a110.447958%20110.447958%200%201%200%20110.206278%20110.447958%20110.689639%20110.689639%200%200%200-110.206278-110.447958z%22%20fill%3D%22%23eeeeee%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M257.184177%20797.545433A36.493746%2036.493746%200%200%201%20221.657153%20761.535048a287.116356%20287.116356%200%200%201%20573.991031-2.175124%2036.252065%2036.252065%200%200%201-72.50413%200%20214.612226%20214.612226%200%200%200-428.982771%202.175124A36.252065%2036.252065%200%200%201%20257.184177%20797.545433z%22%20fill%3D%22%23eeeeee%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M257.184177%20797.545433a36.252065%2036.252065%200%200%201%200-72.50413l501.24522-2.175124a36.252065%2036.252065%200%200%201%2036.252065%2036.010385%2036.493746%2036.493746%200%200%201-36.010384%2036.493745L257.425857%20797.545433z%22%20fill%3D%22%23eeeeee%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat center center; background-size:auto 100%;}
+.form > .user li.selected{border:1px solid #ccc;}
+.form > .user li.own{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M822.716393%201024H192.41382a189.960821%20189.960821%200%200%201-189.719141-189.719141V188.752419A189.960821%20189.960821%200%200%201%20192.41382%200h630.302573a189.960821%20189.960821%200%200%201%20189.719141%20189.719141v644.561718a189.960821%20189.960821%200%200%201-189.719141%20189.719141zM192.41382%2069.362285a119.390135%20119.390135%200%200%200-119.390134%20119.390134v645.52844a119.390135%20119.390135%200%200%200%20119.390134%20119.390135h630.302573a119.390135%20119.390135%200%200%200%20119.390134-119.390135V188.752419a119.390135%20119.390135%200%200%200-119.390134-119.390134z%22%20fill%3D%22%23ff9902%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M508.048467%20546.922823a182.952089%20182.952089%200%201%201%20182.710409-182.710409%20183.193769%20183.193769%200%200%201-182.710409%20182.710409z%20m0-293.158367a110.447958%20110.447958%200%201%200%20110.206278%20110.447958%20110.689639%20110.689639%200%200%200-110.206278-110.447958z%22%20fill%3D%22%23ff9902%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M257.184177%20797.545433A36.493746%2036.493746%200%200%201%20221.657153%20761.535048a287.116356%20287.116356%200%200%201%20573.991031-2.175124%2036.252065%2036.252065%200%200%201-72.50413%200%20214.612226%20214.612226%200%200%200-428.982771%202.175124A36.252065%2036.252065%200%200%201%20257.184177%20797.545433z%22%20fill%3D%22%23ff9902%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M257.184177%20797.545433a36.252065%2036.252065%200%200%201%200-72.50413l501.24522-2.175124a36.252065%2036.252065%200%200%201%2036.252065%2036.010385%2036.493746%2036.493746%200%200%201-36.010384%2036.493745L257.425857%20797.545433z%22%20fill%3D%22%23ff9902%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");}
+.output{height:100%; overflow:auto; overflow-x:hidden; font-size:12px; background:#f3f3f3; border-radius:5px; padding:20px; box-sizing:border-box; -webkit-overflow-scrolling:touch;}
+.output > div{margin-bottom:20px; width:80%; float:left;}
+.output > div > label{color:#ccc; display:block; width:100%; line-height:20px;}
+.output > div > [text]{float:left; max-width:100%; padding:10px; border-radius:5px; background:#fff; word-break:break-all; white-space:pre-wrap;}
+.output > div > [image]{float:left; max-width:100%; max-height:300px; border-radius:5px;}
+.output > div > [audio]{display:block; float:left; min-width:80px; max-width:220px; height:36px; line-height:36px; padding:0 10px 0 30px; border-radius:5px; color:#333; font-size:12px; text-align:left; box-sizing:border-box; background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M344.96%20362.647l-146.526%20150.83L347.89%20664.314c79.122-82.808%2079.122-218.856-2.93-301.667z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M494.413%20214.765l-73.263%2073.941c123.083%20124.215%20123.083%20325.328%200%20449.546l73.263%2073.938c164.11-165.625%20164.11-431.797%200-597.425z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M640.944%2063.934l-73.266%2073.941c205.138%20207.023%20205.138%20541.221%200%20748.256l73.266%2073.935c246.163-245.478%20246.163-647.699%200-896.132z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat 5px center; background-size:auto 64%;}
+.output > div.own{float:right;}
+.output > div.own > label{text-align:right; float:right;}
+.output > div.own > [text]{float:right; background:#a9ea7a;}
+.output > div.own > [image]{float:right;}
+.output > div.own > [audio]{float:right; padding:0 30px 0 10px; text-align:right; background:#a9ea7a url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M337.066667%20505.6c0-115.2%2046.933333-221.866667%20121.6-298.666667l-59.733334-59.733333c-76.8%2078.933333-130.133333%20183.466667-142.933333%20298.666667-2.133333%2019.2-4.266667%2038.4-4.266667%2059.733333s2.133333%2040.533333%204.266667%2059.733333c14.933333%20121.6%2070.4%20230.4%20155.733333%20311.466667l61.866667-59.733333c-85.333333-78.933333-136.533333-187.733333-136.533333-311.466667z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M529.066667%20505.6c0-61.866667%2025.6-119.466667%2066.133333-162.133333L533.333333%20283.733333c-55.466667%2057.6-89.6%20136.533333-89.6%20221.866667%200%2093.866667%2040.533333%20179.2%20104.533334%20236.8l61.866666-59.733333c-51.2-42.666667-81.066667-106.666667-81.066666-177.066667zM667.733333%20418.133333c-21.333333%2023.466667-34.133333%2053.333333-34.133333%2087.466667%200%2042.666667%2021.333333%2078.933333%2051.2%20102.4l87.466667-85.333333-104.533334-104.533334z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat right center; background-size:auto 80%;}
+.output > div.info{width:100%; float:none; clear:both; text-align:center;}
+.output > div.info > div{color:#ccc; background:transparent; float:none; clear:both;}
+.output > div.error{width:100%; float:none; clear:both; text-align:center;}
+.output > div.error > label{display:none;}
+.output > div.error > div{color:#dc0431; background:transparent; opacity:0.5; float:none; clear:both;}
+.audio{display:none; position:fixed; z-index:10; left:50%; top:50%; transform:translate(-50%,-50%); width:150px; height:70px; border-radius:10px; box-shadow:0 0 30px rgba(0,0,0,0.4); background:#a9ea7a url("data:image/svg+xml;charset=utf-8,%3Csvg%20%20width%3D%22100%22%20height%3D%22100%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%225%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.1s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2210%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.3s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2215%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.5s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2220%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.2s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2225%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.4s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2230%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.6s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2235%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.3s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2240%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.1s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2245%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.5s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2250%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.4s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2255%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.2s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2260%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.1s%22%2F%3E%3C%2Frect%3E%3C%2Fsvg%3E") no-repeat 34px 30px; background-size:auto 200%;}
+.audio.show{display:block;}
 @media (max-width: 768px) {
-	.container{padding:36px 0 72px 0;}
-	.form{margin:-36px 0 0 0; float:none; width:100%; padding:0; clear:both;}
-	.form *{border-radius:0 !important;}
-	.form > div{padding-right:180px; margin-bottom:0; position:relative;}
-	.form > div:after{content:""; display:block; position:absolute; z-index:1; left:0; right:0; bottom:0; height:1px; background:#f3f3f3;}
-	.form > div [type="text"]{border:none;}
-	.form > div [type="button"]{margin-right:-90px;}
-	.form > div [type="button"]:first-child{margin-right:-180px;}
-	.form > span{position:absolute; left:0; right:0; bottom:0; padding-right:90px;}
-	.form > span:before{content:""; display:block; position:absolute; z-index:1; left:0; right:0; top:0; height:1px; background:#f3f3f3;}
-	.form > span > textarea{height:36px; border:none; margin-bottom:0;}
-	.form > span > label{position:absolute; top:0; right:0;}
-	.form > span > label input{margin:0;}
-	.form > span > label input:last-child{display:none;}
-	.form > label{position:absolute; left:0; right:0; bottom:36px; margin:0; padding-right:calc(100% / 2);}
-	.form > label:before{content:""; display:block; position:absolute; z-index:1; left:0; right:0; top:0; height:1px; background:#f3f3f3;}
-	.form > label:after{content:""; display:block; position:absolute; z-index:1; left:50%; top:0; bottom:0; width:1px; background:#f3f3f3;}
-	.form > label select{border:none;}
-	.form > label select:first-child{margin-right:-100%;}
-	#output{float:none; padding:15px; clear:both; border-radius:0;}
-	#output > div{width:90%;}
+	.container{padding:44px 0 40px 0;}
+	.container.toggle{padding-bottom:110px;}
+	.form > .connect div{padding:33.3% 0 0 0; width:33.3%; height:auto;}
+    .form > .header{display:block; position:absolute; left:0; right:0; top:0; background:#fff; height:44px; line-height:44px; text-align:center; transition:all 0.3s ease-out;}
+    .form > .header div{position:absolute; left:0; top:0; width:44px; height:100%; cursor:pointer; background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M301.568%20536.32c-7.168%200-14.336-2.816-19.968-8.192-11.008-11.008-11.008-28.928%200-39.936L702.464%2067.584c11.008-11.008%2028.928-11.008%2039.936%200%2011.008%2011.008%2011.008%2028.928%200%2039.936L321.536%20528.128c-5.376%205.376-12.8%208.192-19.968%208.192z%22%20fill%3D%22%23666666%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M722.432%20964.864c-7.168%200-14.336-2.816-19.968-8.192L281.6%20535.808c-11.008-11.008-11.008-28.928%200-39.936%2011.008-11.008%2028.928-11.008%2039.936%200L742.4%20916.736c11.008%2011.008%2011.008%2028.928%200%2039.936-5.632%205.376-12.8%208.192-19.968%208.192z%22%20fill%3D%22%23666666%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat center center; background-size:auto 50%;}
+    .form > .header span{display:block; font-size:15px;}
+	.form > .msg{position:absolute; left:0; right:0; bottom:0; padding:5px 80px 5px 5px; margin:0; height:40px; background:#f6f6f6; transition:all 0.3s ease-out;}
+    .form > .msg:before{content:""; display:block; position:absolute; z-index:1; left:0; right:0; top:0; height:1px; background:#e7e7e7;}
+	.form > .msg > textarea{height:30px; line-height:30px; border-radius:3px; padding:0 10px; border:none; margin-bottom:0;}
+	.form > .msg > div{position:absolute; top:0; right:0; width:80px; height:100%;}
+	.form > .msg > div input{width:40px; padding:0; margin:0; border-radius:0; font-size:0; background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M865.28%20202.5472c-17.1008-15.2576-41.0624-19.6608-62.5664-11.5712L177.7664%20427.1104c-23.2448%208.8064-38.5024%2029.696-39.6288%2054.5792-1.1264%2024.8832%2011.9808%2047.104%2034.4064%2058.0608l97.5872%2047.7184c4.5056%202.2528%208.0896%206.0416%209.9328%2010.6496l65.4336%20161.1776c7.7824%2019.1488%2024.4736%2032.9728%2044.7488%2037.0688%2020.2752%204.096%2041.0624-2.1504%2055.6032-16.7936l36.352-36.352c6.4512-6.4512%2016.5888-7.8848%2024.576-3.3792l156.5696%2088.8832c9.4208%205.3248%2019.8656%208.0896%2030.3104%208.0896%208.192%200%2016.4864-1.6384%2024.2688-5.0176%2017.8176-7.68%2030.72-22.8352%2035.4304-41.6768l130.7648-527.1552c5.5296-22.016-1.7408-45.2608-18.8416-60.416z%20m-20.8896%2050.7904L713.5232%20780.4928c-1.536%206.2464-5.8368%2011.3664-11.776%2013.9264s-12.5952%202.1504-18.2272-1.024L526.9504%20704.512c-9.4208-5.3248-19.8656-7.9872-30.208-7.9872-15.9744%200-31.744%206.144-43.52%2017.92l-36.352%2036.352c-3.8912%203.8912-8.9088%205.9392-14.2336%206.0416l55.6032-152.1664c0.512-1.3312%201.2288-2.56%202.2528-3.6864l240.3328-246.1696c8.2944-8.4992-2.048-21.9136-12.3904-16.0768L301.6704%20559.8208c-4.096-3.584-8.704-6.656-13.6192-9.1136L190.464%20502.9888c-11.264-5.5296-11.5712-16.1792-11.4688-19.3536%200.1024-3.1744%201.536-13.824%2013.2096-18.2272L817.152%20229.2736c10.4448-3.9936%2018.0224%201.3312%2020.8896%203.8912%202.8672%202.4576%209.0112%209.3184%206.3488%2020.1728z%22%20fill%3D%22%23398bfc%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat center center; background-size:70% auto;}
+    .form > .msg > div label{display:block; width:40px; background:url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M512%20958.016611c-119.648434%200-232.1288-46.367961-316.736783-130.559656-84.640667-84.255342-131.263217-196.255772-131.263217-315.455235%200-119.168499%2046.624271-231.199892%20131.232254-315.424271%2084.607983-84.191695%20197.088348-130.559656%20316.736783-130.559656s232.1288%2046.367961%20316.704099%20130.559656c84.67163%2084.224378%20131.263217%20196.255772%20131.263217%20315.391587%200.032684%20119.199462-46.591587%20231.232576-131.263217%20315.455235C744.1288%20911.615966%20631.648434%20958.016611%20512%20958.016611zM512%20129.983389c-102.623626%200-199.071738%2039.743475-271.583282%20111.936783-72.480581%2072.12794-112.416718%20168.063432-112.416718%20270.079828s39.903454%20197.951888%20112.384034%20270.047144c72.511544%2072.191587%20168.959656%20111.936783%20271.583282%20111.936783%20102.592662%200%20199.071738-39.743475%20271.583282-111.936783%2072.480581-72.160624%20112.416718-168.063432%20112.384034-270.079828%200-102.016396-39.903454-197.919204-112.384034-270.016181C711.071738%20169.759548%20614.592662%20129.983389%20512%20129.983389z%22%20fill%3D%22%23666666%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M736.00086%20480.00086%20544.00086%20480.00086%20544.00086%20288.00086c0-17.664722-14.336138-32.00086-32.00086-32.00086s-32.00086%2014.336138-32.00086%2032.00086l0%20192L288.00086%20480.00086c-17.664722%200-32.00086%2014.336138-32.00086%2032.00086s14.336138%2032.00086%2032.00086%2032.00086l192%200%200%20192c0%2017.695686%2014.336138%2032.00086%2032.00086%2032.00086s32.00086-14.303454%2032.00086-32.00086L544.00258%20544.00086l192%200c17.695686%200%2032.00086-14.336138%2032.00086-32.00086S753.696546%20480.00086%20736.00086%20480.00086z%22%20fill%3D%22%23666666%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat center center; background-size:60% auto;}
+    .form > .msg > span{position:absolute; left:0; right:0; bottom:0; height:0; overflow:hidden; box-sizing:border-box; background:#f6f6f6; transform:translateY(100%); transition:height 0.3s ease-out;}
+    .form > .msg > span:before{content:""; display:block; position:absolute; z-index:1; left:0; right:0; top:0; height:1px; background:#e7e7e7;}
+    .form > .msg > span a, .form > .msg > span a:hover{width:50px; height:50px; font-size:0; border:none; margin:10px 0 0 10px; border-radius:10px; background-color:#fff;}
+    .form > .msg > span a[image]{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201128%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M165.789%2099.167h783c22.5%200%2040.5%2018%2040.5%2040.5v319.5c-40.5-31.5-117-81-175.5-81-85.5%200-162%20198-256.5%20198-72-4.5-171-85.5-283.5-72-45%209-108%2081-148.5%20135v-499.5c0-22.5%2018-40.5%2040.5-40.5zM354.788%20423.167c-36%200-67.5-13.5-90-36s-36-58.5-36-90c0-31.5%2013.5-67.5%2036-90%2022.5-22.5%2054-36%2090-36%2031.5%200%2063%2013.5%2090%2036%2022.5%2022.5%2036%2058.5%2036%2090%200%2031.5-13.5%2067.5-36%2090-27%2022.5-58.5%2036-90%2036zM971.288%2040.667h-828c-45%200-81%2036-81%2081v738c0%2045%2036%2081%2081%2081h828c45%200%2081-36%2081-81v-738c0-45-36-81-81-81z%22%20fill%3D%22%23444444%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");}
+    .form > .msg > span a[audio]{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M512%20683.52c130.56%200%20235.52-102.4%20235.52-232.96V256c0-130.56-104.96-232.96-235.52-232.96s-235.52%20102.4-235.52%20232.96v194.56c0%20130.56%20102.4%20232.96%20235.52%20232.96z%20m368.64-281.6c0-23.04-20.48-43.52-46.08-43.52s-43.52%2020.48-43.52%2043.52c0%205.12%200%2010.24%202.56%2012.8v33.28c0%20151.04-125.44%20276.48-281.6%20276.48-153.6%200-281.6-125.44-281.6-276.48V409.6c0-2.56%202.56-5.12%202.56-10.24%200-23.04-20.48-43.52-43.52-43.52-25.6%200-43.52%2020.48-43.52%2043.52v64c0%20186.88%20140.8%20335.36%20320%20360.96v87.04h-122.88c-25.6%200-46.08%2020.48-46.08%2046.08s20.48%2043.52%2046.08%2043.52h332.8c28.16%200%2043.52-17.92%2043.52-43.52%200-23.04-17.92-46.08-43.52-46.08h-122.88v-87.04c184.32-20.48%20327.68-174.08%20327.68-360.96v-61.44z%20m0%200%22%20fill%3D%22%23444444%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");}
+    .form input:checked + .msg{bottom:70px;}
+    .form input:checked + .msg > span{height:70px;}
+    .form > .user{position:fixed; z-index:9; left:0; top:0; right:0; bottom:0; background:#fff; height:auto; overflow:auto; overflow-x:hidden; transition:all 0.3s ease-out;}
+    .form > .user li{position:relative; display:block; padding-left:70px; width:auto; height:70px; line-height:70px; text-align:left; font-size:16px; border-radius:0; margin:0; background-position:15px center; background-size:auto calc(100% - 15px * 2);}
+    .form > .user li:after{content:""; display:block; position:absolute; left:0; right:0; bottom:0; height:1px; background:#eee;}
+    .form > .user li.selected{border:1px solid transparent;}
+	.output{float:none; padding:15px; clear:both; border-radius:0; background:#ededed; transition:all 0.3s ease-out;}
+	.output > div{width:90%;}
+    .form > .connect ~ .user{transform:translateX(100%);}
+    .form > .connect.connected{transform:translateX(-100%);}
+    .form > .connect.connected ~ .user{transform:translateX(0);}
+    .form.user-selected > .connect.connected ~ .user{transform:translateX(-100%);}
+    .form > .header, .form > .msg, .form ~ .output{transform:translateX(100%);}
+    .form.user-selected > .header, .form.user-selected > .msg, .form.user-selected ~ .output{transform:translateX(0);}
 }
 </style>
 </head>
 
 <body>
 <div class="container">
-	<form name="myform" class="form">
-		<div>
-			<input type="button" name="disconnectButton" value="Disconnect" disabled onclick="doDisconnect()">
-			<input type="button" name="connectButton" value="Connect" onclick="doConnect()">
-			<input type="text" name="url" value="" />
+	<form class="form">
+		<div class="connect">
+			<div id="connect" onclick="connect()"></div>
+			<input type="text" id="url" value="" />
 		</div>
-		<label>
-			<select name="period" onchange="changeCh()">
-				<option value="1min">1MIN</option>
-				<option value="30min">30MIN</option>
-				<option value="60min">60MIN</option>
-			</select>
-			<select name="symbol" onchange="changeCh()">
-				<option value="btc">BTC</option>
-				<option value="eth">ETH</option>
-			</select>
-		</label>
-		<span>
-			<textarea name="inputtext">Hello World!</textarea>
-			<label>
-				<input type="button" name="sendButton" value="Send" onclick="sendText()">
-				<input type="button" name="clearButton" value="Clear" onclick="clearText()">
-			</label>
+		<span class="header">
+			<div></div>
+			<span></span>
 		</span>
+		<input type="checkbox" id="toggle">
+		<span class="msg clear-after">
+			<textarea>Hello~</textarea>
+			<div>
+				<input type="button" value="Send" onclick="sendText()">
+				<label for="toggle"></label>
+			</div>
+			<span>
+				<a href="javascript:void(0)" onclick="sendImage()" image>Image</a>
+				<a href="javascript:void(0)" audio>Audio</a>
+			</span>
+		</span>
+		<ul class="user clear-after"></ul>
 	</form>
-	<div id="output"></div>
+	<div class="output"></div>
+	<div class="audio"></div>
 </div>
 </body>
 </html>
 <script>
-let ws = null, host = 'ws://localhost:7312';
+let host = 'ws://localhost:2348';
+let ws = null, req = request(), userId = (req && typeof req.id !== 'undefined') ? parseInt(req.id) : randomNum(100, 999);
+let to = '', toTarget = 0, userList = [], historyFirstId = 0, recorder = null, audioHandle = null;
 if (window.localStorage.getItem('Websocket.host')) host = window.localStorage.getItem('Websocket.host');
-document.myform.url.value = host;
-
-function doConnect() {
-	let value = document.myform.url.value;
+$('#url').val(host);
+function connect() {
+	if (ws) return;
+	let value = $('#url').val();
 	window.localStorage.setItem('Websocket.host', value);
 	ws = new WebSocket(value);
-	ws.onopen = onOpen;
-	ws.onclose = onClose;
-	ws.onerror = onError;
-	ws.onmessage = onMessage;
+	ws.onopen = function() {
+		$('.output').html('');
+		writeToScreen('Connected', 'info');
+		$('#connect').parent().addClass('connected');
+		ws.send(JSON.stringify({type:'bind', id:userId}));
+	};
+	ws.onclose = function() {
+		writeToScreen('Disconnected', 'info');
+		$('.form').removeClass('user-selected');
+		$('#connect').parent().removeClass('connected');
+	};
+	ws.onerror = function(e) {
+		writeToScreen('Error: ' + JSON.stringify(e), 'error');
+		ws.close();
+		ws = null;
+		$('.user').removeClass('selected');
+		$('#connect').parent().removeClass('connected');
+	};
+	ws.onmessage = function(e) {
+		try {
+			let data = JSON.parse(e.data);
+			if (data.type === 'error') {
+				writeToScreen(data.msg, 'error');
+			} else if (data.type === 'chat') {
+				writeToScreen(data.msg);
+			} else if (data.type === 'group') {
+				writeToScreen(data.msg);
+			} else if (data.type === 'userList') {
+				setUserList(data.msg);
+			} else if (data.type === 'history') {
+				setHistory(data.msg, typeof data.direction !== 'undefined' ? data.direction : 0);
+			}
+		} catch (e) {
+			writeToScreen(e);
+		}
+	};
 }
-function doDisconnect() {
-	ws.close();
-	ws = null;
+function request() {
+	let params = {}, pairs, query = window.location.href;
+	query = query.replace(new RegExp('^[^\?]+\\??'), '');
+	if(!query.length)return null;
+	pairs = query.split('&');
+	for(let i=0; i<pairs.length; i++){
+		let kv = pairs[i].split('='), key, val;
+		key = decodeURIComponent(kv[0]);
+		val = decodeURIComponent(pairs[i].substr((kv[0]).length+1));
+		params[key] = val;
+	}
+	return params;
 }
-function onOpen() {
-	writeToScreen('Connected');
-	document.myform.connectButton.disabled = true;
-	document.myform.disconnectButton.disabled = false;
+function randomNum(min, max) {
+	switch (arguments.length) {
+		case 1:return parseInt(Math.random()*min+1, 10);
+		case 2:return parseInt(Math.random()*(max-min+1)+min, 10);
+		default:return 0;
+	}
 }
-function onClose() {
-	writeToScreen('Disconnected');
-	document.myform.connectButton.disabled = false;
-	document.myform.disconnectButton.disabled = true;
+function setUserList(list) {
+	userList = list;
+	let html = '';
+	for (let i in list) {
+		if (parseInt(list[i].id) === userId) continue;
+		let nickname = (typeof list[i].nick_name === 'undefined' || !list[i].nick_name) ? list[i].id : list[i].nick_name;
+		let avatar = (typeof list[i].avatar === 'undefined' || !list[i].avatar) ? '' : 'style="background-image:url('+list[i].avatar+');"';
+		html += '<li '+(parseInt(list[i].id) === userId ? 'class="own"' : '')+' '+avatar+' data-to="'+list[i].id+'" data-target="'+list[i].target+'" data-nickname="'+nickname+'">'+nickname+'</li>';
+	}
+	$('.user').html(html);
 }
-function onError(e) {
-	writeToScreen('Error: ' + JSON.stringify(e));
-	ws.close();
-	ws = null;
-	document.myform.connectButton.disabled = false;
-	document.myform.disconnectButton.disabled = true;
+function setHistory(list, direction) {
+	if (document.documentElement.clientWidth <= 768) {
+		$('.form').addClass('user-selected');
+	}
+	for (let i in list) {
+		writeToScreen(list[i], parseInt(list[i].from) === userId ? 'own' : '', direction);
+	}
 }
-function onMessage(e) {
-	writeToScreen(e.data);
+function writeToScreen(data, cls, prepend) {
+	if (typeof cls === 'undefined') cls = '';
+	let now = new Date(), y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate(), h = now.getHours(), n = now.getMinutes(), s = now.getSeconds();
+	let time = y + '-' + (String(m).length>1?m:'0'+m) + '-' + (String(d).length>1?d:'0'+d) + ' ' + (String(h).length>1?h:'0'+h) + ':' + (String(n).length>1?n:'0'+n) + ':' + (String(s).length>1?s:'0'+s);
+	let id = 0, html = '';
+	if ($.isPlainObject(data) && typeof data.mode !== 'undefined') {
+		if (typeof data.id !== 'undefined') id = data.id;
+		if (typeof data.add_time !== 'undefined') time = data.add_time;
+		switch (parseInt(data.mode)) {
+			case 0:html = '<div text>'+data.msg+'</div>';break;
+			case 1:html = '<img src="'+data.msg+'" data-src="'+data.msg+'" image>';break;
+			case 2:
+				let audioId = 'audio-' + randomNum(1000, 9999);
+				html = '<span id="'+audioId+'" data-src="'+data.msg+'" audio></span>';
+				let audio = new Audio(data.msg);
+				audio.addEventListener('canplaythrough', function() {
+					let maxWidth = parseInt($('#'+audioId).css('max-width').replace('px', ''));
+					let duration = parseInt(audio.duration);
+					$('#'+audioId).html(duration+'"').removeAttr('id').width(maxWidth*duration/60);
+				});
+				break;
+		}
+	} else {
+		html = '<div>' + data + '</div>';
+	}
+	html = '<div class="'+cls+'" data-id="'+id+'"><label>'+time+'</label>' + html + '</div>';
+	if (prepend) {
+		$('.output').prepend(html);
+	} else {
+		$('.output').append(html);
+		$('.output').scrollTop($('.output')[0].scrollHeight);
+		$('.output img').each(function() {
+			$(this)[0].onload = function() {$('.output').scrollTop($('.output')[0].scrollHeight)};
+		});
+	}
+	let firstItem = $('.output div:eq(0)');
+	historyFirstId = !!firstItem.attr('data-id') ? parseInt(firstItem.attr('data-id')) : 0;
 }
 function sendText() {
 	if (!ws) return;
-	let msg = document.myform.inputtext.value;
-	writeToScreen(msg, 'own');
-	ws.send(msg);
+	if (!String(to).length) return;
+	let msg = $('textarea').val();
+	if (!msg.length) return;
+	writeToScreen({msg:msg, add_time:'刚刚'}, 'own');
+	ws.send(JSON.stringify({type:toTarget === 0?'chat':'group', msg:msg, to:to, mode:0}));
+	$('textarea').val('');
 }
-function clearText() {
-	document.myform.inputtext.value = '';
-}
-function showTime() {
-	let now = new Date(), y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate(), h = now.getHours(), n = now.getMinutes(), s = now.getSeconds();
-	return y + '-' + m + '-' + d + ' ' + h + ':' + n + ':' + s;
-}
-function writeToScreen(msg, cls) {
-	if (typeof cls === 'undefined') cls = '';
-	document.getElementById('output').innerHTML += '<div class="'+cls+'"><label>'+showTime()+'</label><div>' + msg + '</div></div>';
-	document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
-}
-function changeCh() {
+function sendImage() {
 	if (!ws) return;
-	let symbol = document.myform.symbol.value;
-	let period = document.myform.period.value;
-	let data = {
-		set: 'ch',
-		symbol: symbol,
-		period: period
-	}
-	ws.send(JSON.stringify(data));
+	if (!String(to).length) return;
+	$.getJSON('https://api.btstu.cn/sjbz/api.php?lx=fengjing&method=mobile&format=json', function(json) {
+		let msg = json.imgurl;
+		writeToScreen({msg:msg, mode:1, add_time:'刚刚'}, 'own');
+		ws.send(JSON.stringify({type:toTarget === 0?'chat':'group', msg:msg, to:to, mode:1}));
+	});
 }
+function sendAudio() {
+	if (!ws) return;
+	if (!String(to).length) return;
+	recorder.getBlob(function(blob) { //获取成功回调函数,blob即为MP3编码的音频文件
+		console.log(blob);
+		let msg = 'https://cdn.jsdelivr.net/gh/ajsong/images/main.mp3';
+		writeToScreen({msg:msg, mode:2, add_time:'刚刚'}, 'own');
+		ws.send(JSON.stringify({type:toTarget === 0?'chat':'group', msg:msg, to:to, mode:2}));
+	}, function(msg) { //获取失败回调函数
+		alert(msg);
+	});
+}
+$(function() {
+	$(document).on('click', function(e) {
+		let currentTarget = $(e.target);
+		if (currentTarget.is('.container') || currentTarget.is('.user')) {
+			to = '';
+			toTarget = 0;
+			historyFirstId = 0;
+			$('.output').html('');
+			$('.user li').removeClass('selected');
+		} else if (currentTarget.is('.user li')) {
+			if (!ws) return;
+			to = '';
+			toTarget = 0;
+			historyFirstId = 0;
+			$('.output').html('');
+			$('.user li').removeClass('selected');
+			let li = currentTarget, id = parseInt(li.attr('data-to')), target = parseInt(li.attr('data-target'));
+			if (userId === id && target === 0) return;
+			li.addClass('selected');
+			to = id;
+			toTarget = target;
+			ws.send(JSON.stringify({type:'history', to:to, target:target}));
+			if (document.documentElement.clientWidth <= 768) {
+				$('.header span').html(li.attr('data-nickname'));
+			}
+		}
+	});
+	$('.header div').on('click', function() {
+		$('.form').removeClass('user-selected');
+		to = '';
+		toTarget = 0;
+		historyFirstId = 0;
+		$('.output').html('');
+	});
+	$('.msg a[image]').on('click', function() {
+		$('#toggle').prop('checked', false);
+		$('.container').removeClass('toggle');
+	});
+	$('.msg a[audio]').on('mousedown touchstart', function() {
+		$('.audio').addClass('show');
+		recorder.start(); //开始录音
+	}).on('mouseup touchend', function() {
+		$('.audio').removeClass('show');
+		recorder.stop(); //停止录音
+	});
+	$('#toggle').on('change', function() {
+		if (this.checked) $('.container').addClass('toggle');
+		else $('.container').removeClass('toggle');
+	});
+	$('.output').on('click', function() {
+		$('#toggle').prop('checked', false);
+		$('.container').removeClass('toggle');
+	}).on('scroll', function() {
+		if (!ws) return;
+		$('#toggle').prop('checked', false);
+		$('.container').removeClass('toggle');
+		if ($(this).scrollTop() === 0) {
+			ws.send(JSON.stringify({type:'history', to:to, target:toTarget, first:historyFirstId, direction:1}));
+		}
+	});
+	$('.output').on('click', '[audio]', function() {
+		if (!!$(this).attr('playing')) {
+			$(this).removeAttr('playing');
+			audioHandle.pause();
+			audioHandle.currentTime = 0;
+		} else {
+			if (audioHandle) {
+				audioHandle.pause();
+				audioHandle.currentTime = 0;
+			}
+			$(this).attr('playing', 'playing');
+			audioHandle = new Audio($(this).attr('data-src'));
+			audioHandle.play();
+		}
+	});
+	recorder = new Recorder({
+		sampleRate: 44100, //采样频率，默认为44100Hz(标准MP3采样率)
+		bitRate: 128, //比特率，默认为128kbps(标准MP3质量)
+		success: function() {
+			sendAudio();
+		},
+		error: function(msg) {
+			console.log(msg);
+		},
+		fix: function(msg) { //不支持H5录音回调函数
+			alert(msg);
+		}
+	});
+});
 </script>
