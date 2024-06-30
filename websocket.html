@@ -22,9 +22,10 @@ ul, li, img{list-style:none; padding:0; margin:0; border:none;}
 .form > .connect div:after{content:""; display:block; position:absolute; left:0; top:0; right:0; bottom:0; border-radius:50%; background:#eee url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M297.3%20922c-52.3%200-101.4-20.3-138.2-57.1S102%20779%20102%20726.7s20.3-101.4%2057.1-138.2l141.8-141.8c13.7-13.7%2035.8-13.7%2049.5%200s13.7%2035.8%200%2049.5L208.5%20638c-48.9%2048.9-48.9%20128.5%200%20177.4%2024.5%2024.5%2056.6%2036.7%2088.7%2036.7s64.2-12.2%2088.7-36.7l141.9-141.9c23.6-23.6%2036.5-55.1%2036.5-88.7s-13-65.1-36.5-88.7c-13.7-13.7-13.7-35.8%200-49.5s35.8-13.7%2049.5%200c36.8%2036.8%2057.1%2085.9%2057.1%20138.2S614.1%20686.2%20577.3%20723L435.4%20864.9c-36.7%2036.8-85.8%2057.1-138.1%2057.1z%22%20fill%3D%22%23d81e06%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M471.4%20587.6c-9%200-17.9-3.4-24.7-10.3-36.8-36.8-57.1-85.9-57.1-138.2s20.3-101.4%2057.1-138.2l141.8-141.8c36.8-36.8%2085.9-57.1%20138.2-57.1s101.4%2020.3%20138.2%2057.1S922%20245%20922%20297.3s-20.3%20101.4-57.1%20138.2L723.2%20577.3c-13.7%2013.7-35.8%2013.7-49.5%200s-13.7-35.8%200-49.5L815.4%20386c23.6-23.6%2036.6-55.1%2036.6-88.7s-13-65.1-36.5-88.7c-23.6-23.6-55.1-36.5-88.7-36.5s-65.1%2013-88.7%2036.5l-142%20141.8c-23.6%2023.6-36.5%2055.1-36.5%2088.7s13%2065.1%2036.5%2088.7c13.7%2013.7%2013.7%2035.8%200%2049.5-6.8%206.9-15.7%2010.3-24.7%2010.3z%22%20fill%3D%22%23d81e06%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat center center; background-size:60% auto;}
 .container.connected{transform:scale(1);}
 .container.connected .form > .connect{opacity:0;}
-.form > .connect span{display:block; padding:20px 70px 20px 20px; height:76px; box-sizing:border-box;}
+.form > .connect span{display:block; padding:20px 120px 20px 20px; height:76px; box-sizing:border-box;}
 .form > .connect span > input{width:100%; height:100%; border-radius:5px; border:1px solid #ddd; padding:0 10px; box-sizing:border-box;}
 .form > .connect span .checkbox-app{float:right; margin-right:-50px; margin-top:6px;}
+.form > .connect span .checkbox-sent{margin-right:-100px;}
 .form > .header{display:none;}
 .form > input{display:none;}
 .form > .msg{display:block; margin-bottom:15px; box-sizing:border-box;}
@@ -57,6 +58,7 @@ ul, li, img{list-style:none; padding:0; margin:0; border:none;}
 .checkbox-app > *:before{border-radius:22px; background:#fff;}
 .checkbox-app > *:after{width:22px; background:#fff;}
 .checkbox-app input:checked + *{background:#419bf9;}
+.checkbox-sent input:checked + *{background:#00be14;}
 .checkbox-app input:checked + *:after{transform:translate3d(16px,0,0);}
 .output{height:100%; overflow:auto; overflow-x:hidden; font-size:12px; background:#f3f3f3; border-radius:5px; padding:20px; box-sizing:border-box; -webkit-overflow-scrolling:touch;}
 .output > div{margin-bottom:30px; width:80%; float:left; box-sizing:border-box; padding:0 0 0 50px;}
@@ -66,15 +68,15 @@ ul, li, img{list-style:none; padding:0; margin:0; border:none;}
 .output > div > [text]{float:left; max-width:100%; padding:10px; border-radius:5px; background:#fff; word-break:break-all; white-space:pre-wrap;}
 .output > div > [image]{float:left; max-width:100%; max-height:300px; border-radius:5px;}
 .output > div > [audio]{display:block; float:left; min-width:80px; max-width:220px; height:36px; line-height:36px; padding:0 10px 0 30px; border-radius:5px; color:#333; font-size:12px; text-align:left; box-sizing:border-box; background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M344.96%20362.647l-146.526%20150.83L347.89%20664.314c79.122-82.808%2079.122-218.856-2.93-301.667z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M494.413%20214.765l-73.263%2073.941c123.083%20124.215%20123.083%20325.328%200%20449.546l73.263%2073.938c164.11-165.625%20164.11-431.797%200-597.425z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M640.944%2063.934l-73.266%2073.941c205.138%20207.023%20205.138%20541.221%200%20748.256l73.266%2073.935c246.163-245.478%20246.163-647.699%200-896.132z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat 5px center; background-size:auto 60%;}
-.output > div.own{float:right; padding:0 50px 0;}
+.output > div.own{float:right; padding:0 50px 0 0;}
 .output > div.own > strong{float:right; margin:0 -50px 0 0;}
 .output > div.own > label{text-align:right; float:right; display:none;}
 .output > div.own > [text]{float:right; background:#a9ea7a;}
 .output > div.own > [image]{float:right;}
 .output > div.own > [audio]{float:right; padding:0 30px 0 10px; text-align:right; background:#a9ea7a url("data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Cpath%20d%3D%22M337.066667%20505.6c0-115.2%2046.933333-221.866667%20121.6-298.666667l-59.733334-59.733333c-76.8%2078.933333-130.133333%20183.466667-142.933333%20298.666667-2.133333%2019.2-4.266667%2038.4-4.266667%2059.733333s2.133333%2040.533333%204.266667%2059.733333c14.933333%20121.6%2070.4%20230.4%20155.733333%20311.466667l61.866667-59.733333c-85.333333-78.933333-136.533333-187.733333-136.533333-311.466667z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M529.066667%20505.6c0-61.866667%2025.6-119.466667%2066.133333-162.133333L533.333333%20283.733333c-55.466667%2057.6-89.6%20136.533333-89.6%20221.866667%200%2093.866667%2040.533333%20179.2%20104.533334%20236.8l61.866666-59.733333c-51.2-42.666667-81.066667-106.666667-81.066666-177.066667zM667.733333%20418.133333c-21.333333%2023.466667-34.133333%2053.333333-34.133333%2087.466667%200%2042.666667%2021.333333%2078.933333%2051.2%20102.4l87.466667-85.333333-104.533334-104.533334z%22%20fill%3D%22%23333333%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E") no-repeat right center; background-size:auto 70%;}
-.output > div.info{width:100%; float:none; clear:both; text-align:center;}
+.output > div.info{width:100%; float:none; clear:both; text-align:center; padding:0;}
 .output > div.info > div{color:#ccc; background:transparent; float:none; clear:both;}
-.output > div.error{width:100%; float:none; clear:both; text-align:center;}
+.output > div.error{width:100%; float:none; clear:both; text-align:center; padding:0;}
 .output > div.error > label{display:none;}
 .output > div.error > div{color:#dc0431; background:transparent; opacity:0.5; float:none; clear:both;}
 .audio{display:none; position:fixed; z-index:10; left:50%; top:30%; transform:translate(-50%,-50%); width:150px; height:70px; border-radius:10px; box-shadow:0 0 30px rgba(0,0,0,0.4); background:#a9ea7a url("data:image/svg+xml;charset=utf-8,%3Csvg%20%20width%3D%22100%22%20height%3D%22100%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%225%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.1s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2210%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.3s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2215%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.5s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2220%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.2s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2225%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.4s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2230%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.6s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2235%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.3s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2240%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.1s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2245%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.5s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2250%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.4s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2255%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.2s%22%2F%3E%3C%2Frect%3E%3Crect%20x%3D%2260%22%20fill%3D%22%23444444%22%20width%3D%223%22%20height%3D%2210%22%3E%3Canimate%20attributeName%3D%22height%22%20dur%3D%221s%22%20values%3D%223%3B%2010%3B%203%22%20repeatCount%3D%22indefinite%22%20begin%3D%220.1s%22%2F%3E%3C%2Frect%3E%3C%2Fsvg%3E") no-repeat 34px 30px; background-size:auto 200%;}
@@ -149,7 +151,8 @@ ul, li, img{list-style:none; padding:0; margin:0; border:none;}
 		<div class="connect hidden">
 			<div id="connect" onclick="connect()"></div>
 			<span>
-				<label class="checkbox-app"><input type="checkbox" id="remember"><i></i></label>
+				<label class="checkbox-app checkbox-sent" title="直接发送"><input type="checkbox" id="sent"><i></i></label>
+				<label class="checkbox-app" title="自动连接"><input type="checkbox" id="remember"><i></i></label>
 				<input type="text" id="url" value="" />
 			</span>
 		</div>
@@ -193,7 +196,7 @@ ul, li, img{list-style:none; padding:0; margin:0; border:none;}
 let host = 'ws://'+location.host+':2348';
 if (location.protocol === 'https:') host = 'wss://'+location.host+'/wss';
 let ws = null, req = request(), myId = (req && typeof req.id !== 'undefined') ? parseInt(req.id) : randomNum(100, 999);
-let to = '', toTarget = 0, userList = [], historyFirstId = 0, recorder = null, audioHandle = null, lastTime = 0;
+let isSent = false, to = '', toTarget = 0, userList = [], historyFirstId = 0, recorder = null, audioHandle = null, lastTime = 0;
 if (window.localStorage.getItem('Websocket.host')) host = window.localStorage.getItem('Websocket.host');
 $('#url').val(host);
 if (window.localStorage.getItem('Websocket.connect')) connect();
@@ -201,6 +204,7 @@ else $('.connect').removeClass('hidden');
 function connect() {
 	if (ws) return;
 	let value = $('#url').val(), checked = $('#remember')[0].checked;
+	isSent = $('#sent')[0].checked;
 	window.localStorage.setItem('Websocket.host', value);
 	ws = new WebSocket(value);
 	ws.onopen = function() {
@@ -210,6 +214,11 @@ function connect() {
 		sendMsg({type:'bind', id:myId});
 		if (checked) window.localStorage.setItem('Websocket.connect', 'autologin');
 		setTimeout(function() {$('.connect').addClass('hidden')}, 400);
+		if (isSent && document.documentElement.clientWidth <= 768) {
+			$('.form').addClass('user-selected');
+			$('.header div').hide();
+			$('.header span').html(value);
+		}
 	};
 	ws.onclose = function() {
 		writeToScreen('Disconnected', 'info');
@@ -237,9 +246,9 @@ function connect() {
 			} else if (data.type === 'ping') {
 				sendMsg({type:'pong'});
 			} else if (data.type === 'chat') {
-				writeToScreen(data.msg);
+				writeToScreen(data);
 			} else if (data.type === 'group') {
-				writeToScreen(data.msg);
+				writeToScreen(data);
 			} else if (data.type === 'userList') {
 				setUserList(data.msg);
 			} else if (data.type === 'nonJoin') {
@@ -299,7 +308,7 @@ function sendMsg(obj) {
 }
 function sendText() {
 	if (!ws) return;
-	if (!String(to).length) return;
+	if (!isSent && !String(to).length) return;
 	let msg = $('textarea').val();
 	if (!msg.length) return;
 	writeToScreen({msg:msg, add_time:Math.floor(new Date().getTime()/1000)}, 'own');
@@ -308,7 +317,7 @@ function sendText() {
 }
 function sendImage(image) {
 	if (!ws) return;
-	if (!String(to).length) return;
+	if (!isSent && !String(to).length) return;
 	if (image) {
 		let msg = image;
 		writeToScreen({msg:msg, mode:1, add_time:Math.floor(new Date().getTime()/1000)}, 'own');
@@ -326,7 +335,7 @@ function sendImage(image) {
 }
 function sendAudio(url) {
 	if (!ws) return;
-	if (!String(to).length) return;
+	if (!isSent && !String(to).length) return;
 	let msg = url;
 	writeToScreen({msg:msg, mode:2, add_time:Math.floor(new Date().getTime()/1000)}, 'own');
 	sendMsg({type:toTarget === 0?'chat':'group', msg:msg, to:to, mode:2});
@@ -361,7 +370,7 @@ function writeToScreen(data, cls, prepend, isTimeString) {
 			html +
 			'</div>';
 	} else {
-		html = '<div class="'+cls+'" data-id="'+id+'">' +
+		html = '<div class="info" data-id="'+id+'">' +
 			(isTimeString ? '<label>'+data+'</label>' : '<label>'+time+'</label>' + '<div>'+data+'</div>') +
 			'</div>';
 	}
@@ -436,8 +445,8 @@ function closeTool() {
 }
 $(function() {
 	$(document).on('click', function(e) {
+		if (isSent) return;
 		let currentTarget = $(e.target);
-		console.log(currentTarget)
 		if (currentTarget.is('.container') || currentTarget.is('.user')) {
 			to = '';
 			toTarget = 0;
