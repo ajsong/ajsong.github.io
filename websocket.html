@@ -7,7 +7,7 @@
 <meta name="format-detection" content="email=no">
 <meta name="format-detection" content="address=no">
 <title>Websocket</title>
-<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.7.1.min.js"></script>
 <style>
 *{outline:none; resize:none; font-family:"Microsoft YaHei",Arial,sans-serif; box-shadow:none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; -webkit-touch-callout:none; -webkit-appearance:none; appearance:none; -webkit-tap-highlight-color:rgba(255,0,0,0); color:#333;}
 html, body{padding:0; margin:0; height:100%; overflow:hidden; text-align:left; -webkit-touch-callout:none; -webkit-user-select:none;}
@@ -199,6 +199,7 @@ let ws = null, req = request(), myId = (req && typeof req.id !== 'undefined') ? 
 let isSent = false, to = '', toTarget = 0, userList = [], historyFirstId = 0, recorder = null, audioHandle = null, lastTime = 0;
 if (window.localStorage.getItem('Websocket.host')) host = window.localStorage.getItem('Websocket.host');
 $('#url').val(host);
+if (window.localStorage.getItem('Websocket.sent')) $('#sent').prop('checked', true);
 if (window.localStorage.getItem('Websocket.connect')) connect();
 else $('.connect').removeClass('hidden');
 function connect() {
@@ -213,6 +214,8 @@ function connect() {
 		$('.container').addClass('connected');
 		sendMsg({type:'bind', id:myId});
 		if (checked) window.localStorage.setItem('Websocket.connect', 'autologin');
+		if (isSent) window.localStorage.setItem('Websocket.sent', 'true');
+		else window.localStorage.removeItem('Websocket.sent');
 		setTimeout(function() {$('.connect').addClass('hidden')}, 400);
 		if (isSent && document.documentElement.clientWidth <= 768) {
 			$('.form').addClass('user-selected');
@@ -238,6 +241,10 @@ function connect() {
 	};
 	ws.onmessage = function(e) {
 		try {
+			if (isSent) {
+				writeToScreen(e.data);
+				return;
+			}
 			let data = JSON.parse(e.data);
 			if (data.type === 'error') {
 				writeToScreen(data.msg, 'error');
@@ -304,7 +311,9 @@ function setJoin(id) {
 }
 function sendMsg(obj) {
 	if (!ws) return;
-	ws.send(JSON.stringify(obj));
+	if (isSent && typeof obj === 'object' && obj['msg']) obj = obj['msg'];
+	else obj = typeof obj === 'string' ? obj : JSON.stringify(obj);
+	ws.send(obj);
 }
 function sendText() {
 	if (!ws) return;
