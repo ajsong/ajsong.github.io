@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llama Eterna por la Paz</title>
+    <style>
+        :root {
+            --gold: #ffd700;
+            --smoke: rgba(255,255,255,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            line-height: 1.8;
+            min-height: 100vh;
+            opacity: 0;
+            animation: fadeIn 2s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 2rem 0;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--gold);
+            position: relative;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 10px var(--gold); }
+            100% { text-shadow: 0 0 20px var(--gold); }
+        }
+
+        .candle-altar {
+            position: relative;
+            width: 100px;
+            height: 300px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .candle {
+            width: 30px;
+            height: 180px;
+            background: linear-gradient(to right, #444 0%, #fff 30%, #444 100%);
+            margin: 0 auto;
+            position: relative;
+            border-radius: 3px;
+            box-shadow: 0 0 20px rgba(255,215,0,0.2);
+        }
+
+        .flame-wrapper {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .flame {
+            width: 15px;
+            height: 40px;
+            background: linear-gradient(to bottom, #ff4500 0%, var(--gold) 70%);
+            border-radius: 50% 50% 35% 35%;
+            position: relative;
+            animation:
+                flameMove 0.8s ease-in-out infinite alternate,
+                flameGlow 1.2s ease-in-out infinite;
+        }
+
+        @keyframes flameMove {
+            0% { transform: rotate(2deg) scale(1); }
+            100% { transform: rotate(-2deg) scale(1.1); }
+        }
+
+        @keyframes flameGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.5); }
+            50% { box-shadow: 0 0 50px rgba(255,215,0,0.8); }
+        }
+
+        .smoke {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            width: 6px;
+            height: 30px;
+            background: var(--smoke);
+            filter: blur(2px);
+            animation: smokeRise 4s linear infinite;
+        }
+
+        @keyframes smokeRise {
+            0% { transform: translateY(0) scale(0.8); opacity: 0.4; }
+            100% { transform: translateY(-200px) scale(2); opacity: 0; }
+        }
+
+        article {
+            background: rgba(20,20,20,0.9);
+            padding: 2.5rem;
+            margin: 3rem 0;
+            border-left: 4px solid var(--gold);
+            transform: translateY(30px);
+            opacity: 0;
+            animation: articleEntrance 1s ease-out forwards;
+            animation-delay: calc(var(--order) * 0.3s);
+        }
+
+        @keyframes articleEntrance {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        h2 {
+            color: var(--gold);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: normal;
+        }
+
+        p {
+            color: #ccc;
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .quote {
+            border-left: 3px solid #666;
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #999;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 5rem;
+            border-top: 1px solid #333;
+        }
+
+        footer p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* 生成多个烟雾粒子 */
+        .smoke:nth-child(2) { animation-delay: 0.5s; left: 55%; }
+        .smoke:nth-child(3) { animation-delay: 1s; left: 45%; }
+        .smoke:nth-child(4) { animation-delay: 1.5s; left: 52%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="candle-altar">
+                <div class="smoke"></div>
+                <div class="smoke"></div>
+                <div class="smoke"></div>
+                <div class="candle">
+                    <div class="flame-wrapper">
+                        <div class="flame"></div>
+                    </div>
+                </div>
+            </div>
+            <h1>Paz Eterna</h1>
+        </header>
+
+        <article style="--order: 1;">
+            <h2>El Camino de la Concordia</h2>
+            <p>En cada latido humano late el deseo universal de armonía. La guerra no es un destino inevitable, sino un fracaso de la imaginación moral. Recordemos que:</p>
+            <div class="quote">"La paz no es la ausencia de conflictos, sino la capacidad de resolverlos mediante el diálogo"</div>
+            <p>Construyamos puentes de entendimiento donde otros ven muros de división.</p>
+        </article>
+
+        <article style="--order: 2;">
+            <h2>Memoria Histórica</h2>
+            <p>Las cicatrices de la tierra nos hablan en silencio:</p>
+            <ul>
+                <li>1914-1918: La Gran Guerra</li>
+                <li>1939-1945: El Holocausto</li>
+                <li>2022: Crisis Ucraniana</li>
+            </ul>
+            <p>Cada número representa vidas truncadas, sueños destruidos y lecciones por aprender.</p>
+        </article>
+
+        <article style="--order: 3;">
+            <h2>Futuro Compartido</h2>
+            <p>Nuestros hijos merecen:</p>
+            <ul>
+                <li>Libros en lugar de armas</li>
+                <li>Parques en lugar de trincheras</li>
+                <li>Diálogos en lugar de discursos</li>
+            </ul>
+            <p>La verdadera seguridad nace de la justicia social y el respeto mutuo.</p>
+        </article>
+
+        <footer>
+            <p>Que esta llama simbólica ilumine nuestras mentes y caliente nuestros corazones</p>
+            <p>✌️ No a la guerra - Sí al diálogo ✌️</p>
+        </footer>
+    </div>
+</body>
+</html>
